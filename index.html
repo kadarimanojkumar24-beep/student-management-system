@@ -1797,6 +1797,7 @@ function syncDataToGoogleSheets() {
     if(!GOOGLE_SHEETS_WEB_APP_URL) return;
 
     const payload = {
+        ownerId: account?.email || "",
         college,
         students,
         attendance,
