@@ -1,0 +1,3710 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Management System</title>
+
+<!-- Excel Export Library -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background: #f3f6fa;
+    color: #222;
+}
+
+/* HOME */
+.home {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg,#1d4ed8,#2563eb,#60a5fa);
+}
+
+.home-card {
+    background: white;
+    width: 95%;
+    max-width: 650px;
+    padding: 35px;
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(0,0,0,.2);
+}
+
+.auth-switch {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 22px;
+}
+
+.auth-switch button {
+    flex: 1;
+    color: var(--space-muted);
+    background: rgba(114, 167, 255, .1);
+}
+
+.auth-switch button.active {
+    color: #06101f;
+    background: linear-gradient(135deg, #1688b6, var(--space-cyan));
+}
+
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+}
+
+.auth-note {
+    color: var(--space-muted);
+    font-size: .85rem;
+    line-height: 1.45;
+    margin-top: 14px;
+    text-align: center;
+}
+
+.auth-status {
+    min-height: 20px;
+    color: #ff9db5;
+    font-size: .9rem;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.section-entry {
+    display: flex;
+    gap: 8px;
+}
+
+.section-entry input {
+    flex: 1;
+}
+
+.section-entry button {
+    white-space: nowrap;
+    padding: 9px 13px;
+}
+
+.section-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 9px;
+}
+
+.section-chip {
+    padding: 5px 9px;
+    border: 1px solid var(--space-line);
+    border-radius: 999px;
+    color: var(--space-cyan);
+    background: rgba(94, 231, 247, .1);
+    font-size: .82rem;
+}
+
+.image-block {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px;
+    border: 1px dashed var(--space-line);
+    border-radius: 10px;
+    background: rgba(94, 231, 247, .05);
+}
+
+.image-preview {
+    width: 64px;
+    height: 64px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 1px solid var(--space-line);
+    background: rgba(114, 167, 255, .12);
+}
+
+.image-preview:not([src]),
+.image-preview[src=""] {
+    display: none;
+}
+
+.table-photo {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid var(--space-line);
+}
+
+.mind-map {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 28px 18px;
+    margin-top: 24px;
+}
+
+.mind-node {
+    position: relative;
+    padding: 20px;
+    min-height: 130px;
+    border: 1px solid var(--space-line);
+    border-radius: 12px;
+    background: var(--space-panel-soft);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .2);
+}
+
+.mind-node::after {
+    content: '→';
+    position: absolute;
+    top: 42%;
+    right: -25px;
+    color: var(--space-cyan);
+    font-size: 1.4rem;
+}
+
+.mind-node:nth-child(4)::after,
+.mind-node:last-child::after {
+    display: none;
+}
+
+.mind-node h3 {
+    color: var(--space-cyan);
+    margin-bottom: 9px;
+}
+
+.mind-node p {
+    color: var(--space-muted);
+    font-size: .9rem;
+    line-height: 1.45;
+}
+
+.mind-node button {
+    margin-top: 14px;
+    padding: 8px 11px;
+    color: #06101f;
+    background: linear-gradient(135deg, #1688b6, var(--space-cyan));
+}
+
+@media(max-width:900px) {
+    .mind-map {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .mind-node:nth-child(2)::after,
+    .mind-node:nth-child(6)::after {
+        display: none;
+    }
+}
+
+@media(max-width:650px) {
+    .mind-map {
+        grid-template-columns: 1fr;
+    }
+
+    .mind-node::after {
+        content: '↓';
+        top: auto;
+        right: 48%;
+        bottom: -26px;
+    }
+
+    .mind-node:nth-child(4)::after,
+    .mind-node:nth-child(6)::after,
+    .mind-node:last-child::after {
+        display: block;
+    }
+}
+
+.home-card h1 {
+    text-align: center;
+    color: #1d4ed8;
+    margin-bottom: 10px;
+}
+
+.home-card p {
+    text-align: center;
+    color: #666;
+    margin-bottom: 25px;
+}
+
+/* FORMS */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full {
+    grid-column: 1/-1;
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+input, select, textarea {
+    padding: 11px;
+    border: 1px solid #ccd4df;
+    border-radius: 7px;
+    outline: none;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #2563eb;
+}
+
+textarea {
+    min-height: 70px;
+    resize: vertical;
+}
+
+button {
+    border: none;
+    padding: 11px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.primary {
+    background: #2563eb;
+    color: white;
+}
+
+.primary:hover {
+    background: #1d4ed8;
+}
+
+.success {
+    background: #16a34a;
+    color: white;
+}
+
+.danger {
+    background: #dc2626;
+    color: white;
+}
+
+.warning {
+    background: #f59e0b;
+    color: white;
+}
+
+.secondary {
+    background: #64748b;
+    color: white;
+}
+
+.pdf-button {
+    float: right;
+    margin-left: 8px;
+}
+
+table input {
+    min-width: 72px;
+    width: 100%;
+    padding: 7px;
+}
+
+table input[type="number"] {
+    max-width: 100px;
+}
+
+.full-button {
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* DASHBOARD */
+.dashboard {
+    display: none;
+    min-height: 100vh;
+}
+
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 250px;
+    height: 100vh;
+    background: #0f172a;
+    color: white;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.college-small {
+    text-align: center;
+    font-size: 12px;
+    color: #cbd5e1;
+    margin-bottom: 25px;
+}
+
+.sidebar button {
+    width: 100%;
+    margin: 5px 0;
+    text-align: left;
+    background: transparent;
+    color: white;
+}
+
+.sidebar button:hover {
+    background: #1e293b;
+}
+
+.main {
+    margin-left: 250px;
+    padding: 25px;
+}
+
+.topbar {
+    background: white;
+    padding: 18px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.topbar h1 {
+    color: #1e3a8a;
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+/* CARDS */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,.06);
+}
+
+.card h3 {
+    color: #64748b;
+    font-size: 14px;
+}
+
+.card .number {
+    font-size: 28px;
+    font-weight: bold;
+    margin-top: 8px;
+    color: #1d4ed8;
+}
+
+/* TABLE */
+.table-container {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+    white-space: nowrap;
+}
+
+th {
+    background: #eff6ff;
+    color: #1e3a8a;
+}
+
+.tick {
+    color: green;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.cross {
+    color: red;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 15px 0;
+}
+
+.filters select,
+.filters input {
+    min-width: 150px;
+}
+
+/* PROGRESS */
+.progress-bar {
+    width: 100%;
+    background: #e5e7eb;
+    height: 20px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #2563eb;
+}
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    width: 95%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 25px;
+    border-radius: 12px;
+}
+
+/* MOBILE */
+@media(max-width:900px) {
+    .cards {
+        grid-template-columns: repeat(2,1fr);
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        width: 200px;
+    }
+
+    .main {
+        margin-left: 200px;
+    }
+}
+
+@media(max-width:650px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .main {
+        margin-left: 0;
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* SPACE THEME */
+:root {
+    --space-void: #050816;
+    --space-deep: #0a1024;
+    --space-panel: rgba(16, 25, 52, .9);
+    --space-panel-soft: rgba(25, 38, 74, .82);
+    --space-line: rgba(139, 177, 235, .23);
+    --space-text: #edf5ff;
+    --space-muted: #9badca;
+    --space-cyan: #5ee7f7;
+    --space-blue: #72a7ff;
+    --space-pink: #dc8cff;
+}
+
+body {
+    color: var(--space-text);
+    background-color: var(--space-void);
+    background-image:
+        radial-gradient(circle at 14% 18%, rgba(94, 231, 247, .12), transparent 24rem),
+        radial-gradient(circle at 88% 78%, rgba(220, 140, 255, .11), transparent 26rem),
+        radial-gradient(#dceeff .65px, transparent .65px),
+        radial-gradient(#72a7ff .5px, transparent .5px);
+    background-size: auto, auto, 97px 97px, 139px 139px;
+    background-position: center, center, 0 0, 43px 61px;
+}
+
+.home {
+    background-color: var(--space-void);
+    background-image:
+        radial-gradient(circle at 15% 25%, rgba(94, 231, 247, .17), transparent 24rem),
+        radial-gradient(circle at 85% 70%, rgba(220, 140, 255, .14), transparent 28rem),
+        radial-gradient(#dceeff .7px, transparent .7px),
+        radial-gradient(#72a7ff .55px, transparent .55px);
+    background-size: auto, auto, 91px 91px, 137px 137px;
+    background-position: center, center, 0 0, 39px 54px;
+}
+
+.home-card,
+.topbar,
+.card,
+.table-container,
+.modal-content {
+    background: var(--space-panel);
+    border: 1px solid var(--space-line);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .34), 0 0 34px rgba(94, 231, 247, .06);
+    backdrop-filter: blur(14px);
+}
+
+.home-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.home-card::before,
+.topbar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--space-cyan), var(--space-pink), transparent);
+}
+
+.home-card h1,
+.topbar h1 {
+    color: var(--space-cyan);
+    background: linear-gradient(110deg, var(--space-cyan), #fff, var(--space-pink));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.home-card p,
+.college-small,
+.card h3,
+.note {
+    color: var(--space-muted);
+}
+
+label {
+    color: var(--space-muted);
+}
+
+input,
+select,
+textarea {
+    color: var(--space-text);
+    background: var(--space-panel-soft);
+    border-color: var(--space-line);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: #657a9e;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--space-cyan);
+    box-shadow: 0 0 0 3px rgba(94, 231, 247, .12), 0 0 18px rgba(94, 231, 247, .1);
+}
+
+button {
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+}
+
+.primary {
+    color: #06101f;
+    background: linear-gradient(135deg, #1688b6, var(--space-cyan));
+    box-shadow: 0 6px 18px rgba(94, 231, 247, .2);
+}
+
+.success {
+    background: linear-gradient(135deg, #087b76, #43dfb2);
+}
+
+.danger {
+    background: linear-gradient(135deg, #8e315d, #e95c7b);
+}
+
+.warning {
+    background: linear-gradient(135deg, #a6651b, #e8ba50);
+}
+
+.secondary {
+    background: linear-gradient(135deg, #334a73, #617aa8);
+}
+
+.sidebar {
+    background: rgba(6, 11, 29, .96);
+    border-right: 1px solid var(--space-line);
+    box-shadow: 12px 0 35px rgba(0, 0, 0, .18);
+}
+
+.sidebar h2 {
+    color: var(--space-cyan);
+}
+
+.sidebar button {
+    color: var(--space-muted);
+}
+
+.sidebar button:hover,
+.sidebar button.active {
+    color: var(--space-text);
+    background: rgba(94, 231, 247, .12);
+    box-shadow: inset 3px 0 var(--space-cyan);
+}
+
+.card .number {
+    color: var(--space-cyan);
+}
+
+th {
+    color: var(--space-text);
+    background: #172855;
+}
+
+th,
+td {
+    border-color: var(--space-line);
+}
+
+td {
+    color: var(--space-text);
+}
+
+.tick {
+    color: #5ee7b0;
+}
+
+.cross {
+    color: #ff7897;
+}
+
+.progress-bar {
+    background: rgba(139, 177, 235, .16);
+}
+
+.progress-fill {
+    background: linear-gradient(90deg, #1688b6, var(--space-cyan), var(--space-pink));
+}
+
+.modal {
+    background: rgba(1, 4, 15, .78);
+}
+
+@media(max-width:650px) {
+    .home-card,
+    .main {
+        padding: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ======================================================
+    HOME / INSTITUTION INFORMATION
+====================================================== -->
+
+<div class="home" id="homePage">
+
+<div class="home-card">
+
+<h1>Student Management System</h1>
+
+<p>Register a school or college, or login to continue</p>
+
+<div class="auth-switch">
+<button class="active" type="button" id="registerTab" onclick="showAuthForm('register')">Register Institution</button>
+<button type="button" id="loginTab" onclick="showAuthForm('login')">Login</button>
+</div>
+
+<div class="auth-status" id="authStatus" aria-live="polite"></div>
+
+<form id="collegeForm" class="auth-form active">
+
+<div class="form-grid">
+
+<div class="form-group">
+<label>Institution Type *</label>
+<select id="institutionType" required>
+<option value="school">School</option>
+<option value="college">College</option>
+</select>
+</div>
+
+<div class="form-group">
+<label id="institutionNameLabel">Institution Name *</label>
+<input type="text" id="collegeName" required>
+</div>
+
+<div class="form-group">
+<label>Place *</label>
+<input type="text" id="collegePlace" required>
+</div>
+
+<div class="form-group">
+<label>Branch *</label>
+<input type="text" id="collegeBranch" required>
+</div>
+
+<div class="form-group">
+<label>Institution Phone Number *</label>
+<input type="tel" id="collegePhone" required>
+</div>
+
+<div class="form-group full">
+<label>Sections Available *</label>
+<div class="section-entry">
+<input type="text" id="collegeSections" required placeholder="Example: A">
+<button class="secondary" type="button" onclick="addCollegeSection()">Add Section</button>
+</div>
+<div class="section-list" id="sectionList" aria-live="polite"></div>
+</div>
+
+<div class="form-group">
+<label>Admin Email *</label>
+<input type="email" id="registerEmail" required>
+</div>
+
+<div class="form-group">
+<label>Create Password *</label>
+<input type="password" id="registerPassword" minlength="4" required>
+</div>
+
+</div>
+
+<button class="primary full-button" type="submit">
+Register & Enter Dashboard
+</button>
+
+</form>
+
+<form id="loginForm" class="auth-form">
+<div class="form-group">
+<label>Admin Email</label>
+<input type="email" id="loginEmail" required>
+</div>
+
+<div class="form-group">
+<label>Password</label>
+<input type="password" id="loginPassword" required>
+</div>
+
+<button class="primary full-button" type="submit">Login to Dashboard</button>
+<p class="auth-note">Your data is stored locally in this browser.</p>
+</form>
+
+</div>
+</div>
+
+
+<!-- ======================================================
+     DASHBOARD
+====================================================== -->
+
+<div class="dashboard" id="dashboard">
+
+<aside class="sidebar">
+
+<h2>Student Management System</h2>
+
+<div class="college-small" id="sideCollegeName">
+Institution Name
+</div>
+
+<button onclick="showSection('overview')">
+🏠 Dashboard
+</button>
+
+<button onclick="showSection('mindmap')">
+🧭 Mind Map Sequence
+</button>
+
+<button onclick="showSection('students')">
+👨‍🎓 Student Information
+</button>
+
+<button onclick="showSection('faculty')">
+👩‍🏫 Faculty Information
+</button>
+
+<button onclick="showSection('attendance')">
+✓ Attendance
+</button>
+
+<button onclick="showSection('marks')">
+📊 Marks & Ranking
+</button>
+
+<button onclick="showSection('fees')">
+💰 Fees
+</button>
+
+<button onclick="showSection('progress')">
+📈 Student Progress
+</button>
+
+<button onclick="showSection('events')">
+📅 Events
+</button>
+
+<button onclick="showSection('overall')">
+🏆 Overall Progress
+</button>
+
+<button onclick="showSection('export')">
+📥 Excel / PDF Data
+</button>
+
+<button class="danger" onclick="logout()">
+🚪 Logout
+</button>
+
+</aside>
+
+
+<main class="main">
+
+<div class="topbar">
+
+<h1 id="pageTitle">Dashboard</h1>
+
+<div id="collegeDisplay"></div>
+
+<button class="secondary" type="button" onclick="editCollege()">
+Edit Institution Information
+</button>
+
+</div>
+
+<!-- ======================================================
+    MIND MAP SEQUENCE
+====================================================== -->
+
+<div class="section" id="mindmap">
+
+<div class="table-container">
+
+<h2>Student Management Sequence</h2>
+
+<p class="note">Follow the sections in this order to complete the student management workflow.</p>
+
+<div class="mind-map">
+
+<div class="mind-node">
+<h3>1. Institution Setup</h3>
+<p>Register or edit institution details, admin access, branch, phone, and available sections.</p>
+<button onclick="editCollege()">Open Setup</button>
+</div>
+
+<div class="mind-node">
+<h3>2. Student Information</h3>
+<p>Add student identity, family, contact, academic, group, and section information.</p>
+<button onclick="showSection('students')">Open Students</button>
+</div>
+
+<div class="mind-node">
+<h3>3. Attendance</h3>
+<p>Record daily present or absent status and notify registered numbers by SMS.</p>
+<button onclick="showSection('attendance')">Open Attendance</button>
+</div>
+
+<div class="mind-node">
+<h3>4. Marks</h3>
+<p>Enter subject marks, calculate totals and rankings, and send marks updates.</p>
+<button onclick="showSection('marks')">Open Marks</button>
+</div>
+
+<div class="mind-node">
+<h3>5. Fees</h3>
+<p>Enter net fees and the current balance for each student.</p>
+<button onclick="showSection('fees')">Open Fees</button>
+</div>
+
+<div class="mind-node">
+<h3>6. Progress</h3>
+<p>Review marks totals, percentages, and individual student progress.</p>
+<button onclick="showSection('progress')">Open Progress</button>
+</div>
+
+<div class="mind-node">
+<h3>7. Events</h3>
+<p>Record institution events and prepare notifications for students.</p>
+<button onclick="showSection('events')">Open Events</button>
+</div>
+
+<div class="mind-node">
+<h3>8. Review & Export</h3>
+<p>Compare overall performance, then download Excel files or PDF reports.</p>
+<button onclick="showSection('export')">Open Export</button>
+</div>
+
+</div>
+</div>
+</div>
+
+
+<!-- ======================================================
+     OVERVIEW
+====================================================== -->
+
+<div class="section active" id="overview">
+
+<div class="cards">
+
+<div class="card">
+<h3>Total Students</h3>
+<div class="number" id="totalStudents">0</div>
+</div>
+
+<div class="card">
+<h3>Present Today</h3>
+<div class="number" id="presentCount">0</div>
+</div>
+
+<div class="card">
+<h3>Absent Today</h3>
+<div class="number" id="absentCount">0</div>
+</div>
+
+<div class="card">
+<h3>Events</h3>
+<div class="number" id="totalEvents">0</div>
+</div>
+
+</div>
+
+<div class="table-container">
+
+<h2>Institution Information</h2>
+
+<button class="secondary pdf-button" onclick="printSectionPdf('overview','Institution Information')">PDF</button>
+
+<br>
+
+<p><b>Institution:</b> <span id="overviewCollege"></span></p>
+<p><b>Type:</b> <span id="overviewInstitutionType"></span></p>
+<p><b>Place:</b> <span id="overviewPlace"></span></p>
+<p><b>Branch:</b> <span id="overviewBranch"></span></p>
+<p><b>Phone:</b> <span id="overviewPhone"></span></p>
+<p><b>Sections:</b> <span id="overviewSections"></span></p>
+
+</div>
+
+</div>
+
+
+<!-- ======================================================
+     STUDENT INFORMATION
+====================================================== -->
+
+<div class="section" id="students">
+
+<div class="table-container">
+
+<h2>Student Information</h2>
+
+<br>
+
+<button class="primary" onclick="openStudentForm()">
++ New Student
+</button>
+
+<button class="success" onclick="exportStudents()">
+Export Students
+</button>
+
+<button class="secondary pdf-button" onclick="printSectionPdf('students','Student Information')">PDF</button>
+
+<div class="filters">
+
+<select id="studentGroupFilter" onchange="displayStudents()">
+<option value="">All Groups</option>
+<option>MPC</option>
+<option>BiPC</option>
+<option>CEC</option>
+<option>HEC</option>
+<option>MEC</option>
+</select>
+
+<select id="studentSectionFilter" onchange="displayStudents()">
+<option value="">All Sections</option>
+</select>
+
+<input type="text"
+       id="studentSearch"
+       placeholder="Search Admission No / Name"
+       onkeyup="displayStudents()">
+
+</div>
+
+<table>
+
+<thead>
+<tr>
+<th>Admission No.</th>
+<th>Photo</th>
+<th>Name</th>
+<th>Father</th>
+<th>Mother</th>
+<th>Student Phone</th>
+<th>Parent Phone</th>
+<th>Group</th>
+<th>Section</th>
+<th>SSC</th>
+<th>Intermediate</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="studentTable"></tbody>
+
+</table>
+
+</div>
+</div>
+
+
+<!-- ======================================================
+    FACULTY
+====================================================== -->
+
+<div class="section" id="faculty">
+
+<div class="table-container">
+
+<h2>Faculty Information</h2>
+
+<button class="secondary pdf-button" onclick="printSectionPdf('faculty','Faculty Information')">PDF</button>
+
+<p class="note">Add faculty details for teaching staff and keep their contact information available in the dashboard.</p>
+
+<form id="facultyForm">
+
+<input type="hidden" id="facultyEditIndex">
+
+<div class="form-grid">
+
+<div class="form-group full">
+<label>Faculty Photo</label>
+<div class="image-block">
+<img id="facultyImagePreview" class="image-preview" alt="Faculty photo preview">
+<input type="file" id="facultyImage" accept="image/*">
+</div>
+</div>
+
+<div class="form-group">
+<label>Faculty Name *</label>
+<input id="facultyName" required>
+</div>
+
+<div class="form-group">
+<label>Department *</label>
+<input id="facultyDepartment" required placeholder="Example: Mathematics">
+</div>
+
+<div class="form-group">
+<label>Subject</label>
+<input id="facultySubject">
+</div>
+
+<div class="form-group">
+<label>Phone Number</label>
+<input type="tel" id="facultyPhone">
+</div>
+
+<div class="form-group">
+<label>Email</label>
+<input type="email" id="facultyEmail">
+</div>
+
+<div class="form-group">
+<label>Assigned Section</label>
+<select id="facultySection"></select>
+</div>
+
+</div>
+
+<button class="primary" type="submit" id="facultySaveButton">Add Faculty</button>
+<button class="secondary" type="button" onclick="resetFacultyForm()">Clear</button>
+
+</form>
+
+<table>
+
+<thead>
+<tr>
+<th>Photo</th>
+<th>Name</th>
+<th>Department</th>
+<th>Subject</th>
+<th>Phone</th>
+<th>Email</th>
+<th>Section</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="facultyTable"></tbody>
+
+</table>
+
+</div>
+</div>
+
+
+<!-- ======================================================
+     ATTENDANCE
+====================================================== -->
+
+<div class="section" id="attendance">
+
+<div class="table-container">
+
+<h2>Attendance</h2>
+
+<button class="secondary pdf-button" onclick="printSectionPdf('attendance','Attendance')">PDF</button>
+
+<button class="primary pdf-button" onclick="sendBulkAttendanceSMS()">SMS All</button>
+
+<div class="filters">
+
+<select id="attendanceGroup"
+onchange="displayAttendance()">
+
+<option value="">All Groups</option>
+<option>MPC</option>
+<option>BiPC</option>
+<option>CEC</option>
+<option>HEC</option>
+<option>MEC</option>
+
+</select>
+
+<select id="attendanceSection"
+onchange="displayAttendance()">
+
+<option value="">All Sections</option>
+
+</select>
+
+<input type="date" id="attendanceDate"
+onchange="displayAttendance()">
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+<th>Admission Number</th>
+<th>Student Name</th>
+<th>Section</th>
+<th>Group</th>
+<th>Status</th>
+<th>Present ✓</th>
+<th>Absent ✕</th>
+<th>SMS</th>
+</tr>
+
+</thead>
+
+<tbody id="attendanceTable"></tbody>
+
+</table>
+
+<button class="primary" onclick="submitAttendance()">Submit Attendance</button>
+
+</div>
+</div>
+
+
+<!-- ======================================================
+     MARKS
+====================================================== -->
+
+<div class="section" id="marks">
+
+<div class="table-container">
+
+<h2>Marks & Section Ranking</h2>
+
+<button class="secondary pdf-button" onclick="printSectionPdf('marks','Marks and Section Ranking')">PDF</button>
+
+<button class="primary pdf-button" onclick="sendBulkMarksSMS()">SMS All</button>
+
+<div class="filters">
+
+<select id="marksGroup"
+onchange="displayMarks()">
+
+<option value="">All Groups</option>
+<option>MPC</option>
+<option>BiPC</option>
+<option>CEC</option>
+<option>HEC</option>
+<option>MEC</option>
+
+</select>
+
+<select id="marksSection"
+onchange="displayMarks()">
+
+<option value="">All Sections</option>
+
+</select>
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+<th>Rank</th>
+<th>Admission Number</th>
+<th>Name</th>
+<th>Group</th>
+<th>Section</th>
+<th>Maths</th>
+<th>Physics</th>
+<th>Chemistry</th>
+<th>Biology</th>
+<th>English</th>
+<th>Total</th>
+<th>SMS</th>
+</tr>
+
+</thead>
+
+<tbody id="marksTable"></tbody>
+
+</table>
+
+<button class="primary" onclick="submitMarks()">Submit Marks & Ranking</button>
+
+</div>
+</div>
+
+
+<!-- ======================================================
+     FEES
+====================================================== -->
+
+<div class="section" id="fees">
+
+<div class="table-container">
+
+<h2>Student Fees</h2>
+
+<button class="secondary pdf-button" onclick="printSectionPdf('fees','Student Fees')">PDF</button>
+
+<div class="filters">
+
+<select id="feesGroup"
+onchange="displayFees()">
+
+<option value="">All Groups</option>
+<option>MPC</option>
+<option>BiPC</option>
+<option>CEC</option>
+<option>HEC</option>
+<option>MEC</option>
+
+</select>
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+<th>Admission Number</th>
+<th>Name</th>
+<th>Group</th>
+<th>Net Fees</th>
+<th>Balance</th>
+<th>SMS</th>
+</tr>
+
+</thead>
+
+<tbody id="feesTable"></tbody>
+
+</table>
+
+</div>
+</div>
+
+
+<!-- ======================================================
+     PROGRESS
+====================================================== -->
+
+<div class="section" id="progress">
+
+<div class="table-container">
+
+<h2>Student Progress</h2>
+
+<button class="secondary pdf-button" onclick="printSectionPdf('progress','Student Progress')">PDF</button>
+
+<div class="filters">
+
+<select id="progressStudent"
+onchange="displayProgress()">
+
+<option value="">Overall Progress</option>
+
+</select>
+
+</div>
+
+<div id="progressContent"></div>
+
+</div>
+
+</div>
+
+
+<!-- ======================================================
+     EVENTS
+====================================================== -->
+
+<div class="section" id="events">
+
+<div class="table-container">
+
+<h2>Institution Events</h2>
+
+<button class="secondary pdf-button" onclick="printSectionPdf('events','Institution Events')">PDF</button>
+
+<button class="primary" onclick="addEvent()">
++ Add Event
+</button>
+
+<table>
+
+<thead>
+
+<tr>
+<th>Date</th>
+<th>Event</th>
+<th>Description</th>
+<th>Send SMS</th>
+</tr>
+
+</thead>
+
+<tbody id="eventsTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+<!-- ======================================================
+     OVERALL
+====================================================== -->
+
+<div class="section" id="overall">
+
+<div class="table-container">
+
+<h2>Overall Student Performance</h2>
+
+<button class="secondary pdf-button" onclick="printSectionPdf('overall','Overall Student Performance')">PDF</button>
+
+<table>
+
+<thead>
+
+<tr>
+<th>Rank</th>
+<th>Admission No.</th>
+<th>Name</th>
+<th>Group</th>
+<th>Section</th>
+<th>Total Marks</th>
+<th>Percentage</th>
+</tr>
+
+</thead>
+
+<tbody id="overallTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+<!-- ======================================================
+     EXPORT
+====================================================== -->
+
+<div class="section" id="export">
+
+<div class="table-container">
+
+<h2>Download Institution Data</h2>
+
+<p>
+Select the required data and download it as an Excel file.
+</p>
+
+<br>
+
+<div class="filters">
+
+<select id="exportType">
+
+<option value="students">
+Student Information
+</option>
+
+<option value="attendance">
+Attendance
+</option>
+
+<option value="marks">
+Marks
+</option>
+
+<option value="fees">
+Fees
+</option>
+
+<option value="progress">
+Progress
+</option>
+
+</select>
+
+<select id="exportGroup">
+
+<option value="">All Groups</option>
+<option>MPC</option>
+<option>BiPC</option>
+<option>CEC</option>
+<option>HEC</option>
+<option>MEC</option>
+
+</select>
+
+<select id="exportSection">
+
+<option value="">All Sections</option>
+
+</select>
+
+</div>
+
+<button class="success"
+onclick="exportSelectedData()">
+
+📥 Download Excel
+
+</button>
+
+<button class="secondary pdf-button" onclick="printAllDataPdf()">PDF All Data</button>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+
+<!-- ======================================================
+     STUDENT MODAL
+====================================================== -->
+
+<div class="modal" id="studentModal">
+
+<div class="modal-content">
+
+<h2 id="studentFormTitle">
+Student Information
+</h2>
+
+<br>
+
+<form id="studentForm">
+
+<input type="hidden" id="editIndex">
+
+<div class="form-grid">
+
+<div class="form-group full">
+<label>Student Photo</label>
+<div class="image-block">
+<img id="studentImagePreview" class="image-preview" alt="Student photo preview">
+<input type="file" id="studentImage" accept="image/*">
+</div>
+</div>
+
+<div class="form-group">
+<label>Admission Number *</label>
+<input id="admission" required>
+</div>
+
+<div class="form-group">
+<label>Student Name *</label>
+<input id="studentName" required>
+</div>
+
+<div class="form-group">
+<label>Father's Name</label>
+<input id="fatherName">
+</div>
+
+<div class="form-group">
+<label>Father's Occupation</label>
+<input id="fatherOccupation">
+</div>
+
+<div class="form-group">
+<label>Mother's Name</label>
+<input id="motherName">
+</div>
+
+<div class="form-group">
+<label>Mother's Occupation</label>
+<input id="motherOccupation">
+</div>
+
+<div class="form-group">
+<label>Student Phone Number</label>
+<input type="tel" id="studentPhone">
+</div>
+
+<div class="form-group">
+<label>Parent Phone Number</label>
+<input type="tel" id="parentPhone">
+</div>
+
+<div class="form-group full">
+<label>Address</label>
+<textarea id="address"></textarea>
+</div>
+
+<div class="form-group">
+<label>Student Aadhaar No.</label>
+<input id="studentAadhar">
+</div>
+
+<div class="form-group">
+<label>Father Aadhaar No.</label>
+<input id="fatherAadhar">
+</div>
+
+<div class="form-group">
+<label>Mother Aadhaar No.</label>
+<input id="motherAadhar">
+</div>
+
+<div class="form-group">
+<label>Caste</label>
+<input id="caste">
+</div>
+
+<div class="form-group">
+<label>Religion</label>
+<input id="religion">
+</div>
+
+<div class="form-group">
+<label>SSC Marks</label>
+<input type="number" id="sscMarks">
+</div>
+
+<div class="form-group">
+<label>School Name</label>
+<input id="schoolName">
+</div>
+
+<div class="form-group">
+<label>School Place</label>
+<input id="schoolPlace">
+</div>
+
+<div class="form-group">
+<label>Intermediate Marks</label>
+<input type="number" id="interMarks">
+</div>
+
+<div class="form-group">
+<label>College Name</label>
+<input id="interCollege">
+</div>
+
+<div class="form-group">
+<label>Group</label>
+
+<select id="group">
+
+<option>MPC</option>
+<option>BiPC</option>
+<option>CEC</option>
+<option>HEC</option>
+<option>MEC</option>
+
+</select>
+
+</div>
+
+<div class="form-group">
+<label>Section</label>
+<select id="section"></select>
+</div>
+
+</div>
+
+<button class="primary full-button">
+Save Student
+</button>
+
+<button type="button"
+class="secondary full-button"
+onclick="closeStudentForm()">
+
+Cancel
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* ======================================================
+   DATABASE - LOCAL STORAGE
+====================================================== */
+
+let college = JSON.parse(
+    localStorage.getItem("collegeData")
+) || null;
+
+function institutionTypeName() {
+    return college?.institutionType === "school" ? "School" : "College";
+}
+
+function updateInstitutionLabels() {
+    const type = document.getElementById("institutionType")?.value === "school"
+        ? "School"
+        : "College";
+
+    document.getElementById("institutionNameLabel").innerText = type + " Name *";
+}
+
+document.getElementById("institutionType").addEventListener("change", updateInstitutionLabels);
+
+let account = JSON.parse(
+    localStorage.getItem("collegeAccount")
+) || null;
+
+let students = JSON.parse(
+    localStorage.getItem("students")
+) || [];
+
+students = students.map(student => ({
+    ...student,
+    balanceFee: student.balanceFee !== undefined
+        ? student.balanceFee
+        : Math.max(0, Number(student.netFees) - Number(student.feesPaid))
+}));
+
+let attendance = JSON.parse(
+    localStorage.getItem("attendance")
+) || {};
+
+let events = JSON.parse(
+    localStorage.getItem("events")
+) || [];
+
+let faculty = JSON.parse(
+    localStorage.getItem("faculty")
+) || [];
+
+// Set this after deploying google-apps-script.gs as a web app.
+const GOOGLE_SHEETS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzLcl37yi2_TjJF0nY1x1wyE8mWlO-VXsJF19IXC9kYY7vGKscWMk503HChTvBO8I1u/exec";
+
+function syncDataToGoogleSheets() {
+    if(!GOOGLE_SHEETS_WEB_APP_URL) return;
+
+    const payload = {
+        college,
+        students,
+        attendance,
+        events,
+        faculty,
+        syncedAt: new Date().toISOString()
+    };
+
+    fetch(GOOGLE_SHEETS_WEB_APP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+    }).catch(error => console.warn("Google Sheets sync failed:", error));
+}
+
+function saveLocalData(key, value) {
+    localStorage.setItem(key, value);
+    syncDataToGoogleSheets();
+}
+
+const pendingImages = {
+    student: null,
+    faculty: null
+};
+
+function loadImageFile(input, previewId, type) {
+
+    const file = input.files[0];
+
+    if(!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function() {
+        pendingImages[type] = reader.result;
+        document.getElementById(previewId).src = reader.result;
+    };
+
+    reader.readAsDataURL(file);
+
+}
+
+document.getElementById("studentImage")
+    .addEventListener("change", event => loadImageFile(event.target, "studentImagePreview", "student"));
+
+document.getElementById("facultyImage")
+    .addEventListener("change", event => loadImageFile(event.target, "facultyImagePreview", "faculty"));
+
+
+/* ======================================================
+   STARTUP
+====================================================== */
+
+window.onload = function() {
+
+    if(college) {
+        showAuthForm("login");
+        document.getElementById("authStatus").innerText = account
+            ? "Login to access your " + institutionTypeName().toLowerCase() + " dashboard."
+            : "Please register an admin account to protect your existing institution data.";
+    }
+
+};
+
+
+/* ======================================================
+   COLLEGE FORM
+====================================================== */
+
+document.getElementById("collegeForm")
+.addEventListener("submit", function(e) {
+
+    e.preventDefault();
+
+    college = {
+
+        institutionType: document.getElementById("institutionType").value,
+
+        name: document.getElementById("collegeName").value,
+
+        place: document.getElementById("collegePlace").value,
+
+        branch: document.getElementById("collegeBranch").value,
+
+        phone: document.getElementById("collegePhone").value,
+
+        sections:
+        document.getElementById("collegeSections")
+        .value
+        .split(",")
+        .map(x => x.trim())
+        .filter(x => x)
+
+    };
+
+    account = {
+        email: document.getElementById("registerEmail").value.trim().toLowerCase(),
+        password: document.getElementById("registerPassword").value
+    };
+
+    saveLocalData(
+        "collegeData",
+        JSON.stringify(college)
+    );
+
+    saveLocalData(
+        "collegeAccount",
+        JSON.stringify(account)
+    );
+
+    showDashboard();
+
+});
+
+
+document.getElementById("loginForm")
+.addEventListener("submit", function(e) {
+
+    e.preventDefault();
+
+    const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+    const password = document.getElementById("loginPassword").value;
+
+    if(!account) {
+        document.getElementById("authStatus").innerText =
+            "No account found. Register this institution first.";
+        return;
+    }
+
+    if(email !== account.email || password !== account.password) {
+        document.getElementById("authStatus").innerText =
+            "Incorrect email or password.";
+        return;
+    }
+
+    document.getElementById("authStatus").innerText = "";
+    showDashboard();
+
+});
+
+
+function showAuthForm(type) {
+
+    const register = type === "register";
+
+    document.getElementById("collegeForm").classList.toggle("active", register);
+    document.getElementById("loginForm").classList.toggle("active", !register);
+    document.getElementById("registerTab").classList.toggle("active", register);
+    document.getElementById("loginTab").classList.toggle("active", !register);
+
+    if(register && college) {
+        document.getElementById("institutionType").value = college.institutionType || "college";
+        document.getElementById("collegeName").value = college.name || "";
+        document.getElementById("collegePlace").value = college.place || "";
+        document.getElementById("collegeBranch").value = college.branch || "";
+        document.getElementById("collegePhone").value = college.phone || "";
+        document.getElementById("collegeSections").value = (college.sections || []).join(", ");
+        document.getElementById("registerEmail").value = account?.email || "";
+    }
+
+    updateInstitutionLabels();
+    renderSectionList();
+
+}
+
+
+function addCollegeSection() {
+
+    const input = document.getElementById("collegeSections");
+    const current = input.value.split(",").map(value => value.trim()).filter(Boolean);
+    const section = current.pop() || "";
+
+    if(!section) {
+        input.focus();
+        return;
+    }
+
+    const sections = [...new Set([...current, section])];
+    input.value = sections.join(", ");
+    input.focus();
+    renderSectionList();
+
+}
+
+
+function renderSectionList() {
+
+    const input = document.getElementById("collegeSections");
+    const list = document.getElementById("sectionList");
+
+    if(!input || !list) return;
+
+    const sections = [...new Set(
+        input.value.split(",").map(value => value.trim()).filter(Boolean)
+    )];
+
+    list.innerHTML = sections.map(section =>
+        `<span class="section-chip">${section}</span>`
+    ).join("");
+
+}
+
+
+/* ======================================================
+   DASHBOARD
+====================================================== */
+
+function showDashboard() {
+
+    document.getElementById("homePage")
+    .style.display = "none";
+
+    document.getElementById("dashboard")
+    .style.display = "block";
+
+    document.getElementById("sideCollegeName")
+    .innerText = college.name;
+
+    document.getElementById("collegeDisplay")
+    .innerText =
+        college.name + " | " +
+        college.place;
+
+    document.getElementById("overviewCollege")
+    .innerText = college.name;
+
+    document.getElementById("overviewInstitutionType")
+    .innerText = institutionTypeName();
+
+    document.getElementById("overviewPlace")
+    .innerText = college.place;
+
+    document.getElementById("overviewBranch")
+    .innerText = college.branch;
+
+    document.getElementById("overviewPhone")
+    .innerText = college.phone;
+
+    document.getElementById("overviewSections")
+    .innerText = college.sections.join(", ");
+
+    populateSections();
+
+    updateDashboard();
+    syncDataToGoogleSheets();
+
+}
+
+
+function editCollege() {
+
+    document.getElementById("institutionType").value = college.institutionType || "college";
+    document.getElementById("collegeName").value = college.name || "";
+    document.getElementById("collegePlace").value = college.place || "";
+    document.getElementById("collegeBranch").value = college.branch || "";
+    document.getElementById("collegePhone").value = college.phone || "";
+    document.getElementById("collegeSections").value = (college.sections || []).join(", ");
+
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("homePage").style.display = "flex";
+    document.getElementById("authStatus").innerText = "Update the institution details and account password, then save.";
+    showAuthForm("register");
+
+}
+
+
+/* ======================================================
+   SECTION NAVIGATION
+====================================================== */
+
+function showSection(id) {
+
+    document.querySelectorAll(".section")
+    .forEach(section =>
+        section.classList.remove("active")
+    );
+
+    document.getElementById(id)
+    .classList.add("active");
+
+    const titles = {
+
+        overview: "Dashboard",
+
+        mindmap: "Mind Map Sequence",
+
+        faculty: "Faculty Information",
+
+        students: "Student Information",
+
+        attendance: "Attendance",
+
+        marks: "Marks & Ranking",
+
+        fees: "Fees Management",
+
+        progress: "Student Progress",
+
+        events: "Institution Events",
+
+        overall: "Overall Student Progress",
+
+        export: "Download Data"
+
+    };
+
+    document.getElementById("pageTitle")
+    .innerText = titles[id];
+
+    if(id === "students")
+        displayStudents();
+
+    if(id === "faculty")
+        displayFaculty();
+
+    if(id === "attendance")
+        displayAttendance();
+
+    if(id === "marks")
+        displayMarks();
+
+    if(id === "fees")
+        displayFees();
+
+    if(id === "progress")
+        displayProgress();
+
+    if(id === "events")
+        displayEvents();
+
+    if(id === "overall")
+        displayOverall();
+
+}
+
+
+/* ======================================================
+   POPULATE SECTIONS
+====================================================== */
+
+function populateSections() {
+
+    const selects = [
+
+        "section",
+
+        "facultySection",
+
+        "studentSectionFilter",
+
+        "attendanceSection",
+
+        "marksSection",
+
+        "exportSection"
+
+    ];
+
+    selects.forEach(id => {
+
+        const select =
+            document.getElementById(id);
+
+        if(!select) return;
+
+        const firstOption =
+            select.options[0];
+
+        select.innerHTML = "";
+
+        if(firstOption) {
+
+            const option =
+                document.createElement("option");
+
+            option.value = "";
+
+            option.textContent =
+                firstOption.textContent;
+
+            select.appendChild(option);
+
+        }
+
+        college.sections.forEach(sec => {
+
+            const option =
+                document.createElement("option");
+
+            option.value = sec;
+
+            option.textContent = sec;
+
+            select.appendChild(option);
+
+        });
+
+    });
+
+}
+
+
+/* ======================================================
+   STUDENT FORM
+====================================================== */
+
+function openStudentForm(index = null) {
+
+    document.getElementById("studentModal")
+    .style.display = "flex";
+
+    document.getElementById("studentForm")
+    .reset();
+
+    pendingImages.student = null;
+    document.getElementById("studentImagePreview").removeAttribute("src");
+
+    document.getElementById("editIndex")
+    .value = index === null ? "" : index;
+
+    if(index !== null) {
+
+        const s = students[index];
+
+        document.getElementById("admission").value = s.admission;
+        document.getElementById("studentName").value = s.name;
+        document.getElementById("fatherName").value = s.fatherName;
+        document.getElementById("fatherOccupation").value = s.fatherOccupation;
+        document.getElementById("motherName").value = s.motherName;
+        document.getElementById("motherOccupation").value = s.motherOccupation;
+        document.getElementById("studentPhone").value = s.studentPhone;
+        document.getElementById("parentPhone").value = s.parentPhone;
+        document.getElementById("address").value = s.address;
+        document.getElementById("studentAadhar").value = s.studentAadhar;
+        document.getElementById("fatherAadhar").value = s.fatherAadhar;
+        document.getElementById("motherAadhar").value = s.motherAadhar;
+        document.getElementById("caste").value = s.caste;
+        document.getElementById("religion").value = s.religion;
+        document.getElementById("sscMarks").value = s.sscMarks;
+        document.getElementById("schoolName").value = s.schoolName;
+        document.getElementById("schoolPlace").value = s.schoolPlace;
+        document.getElementById("interMarks").value = s.interMarks;
+        document.getElementById("interCollege").value = s.interCollege;
+        document.getElementById("group").value = s.group;
+        document.getElementById("section").value = s.section;
+        pendingImages.student = s.image || null;
+        if(s.image) document.getElementById("studentImagePreview").src = s.image;
+    }
+
+}
+
+
+function closeStudentForm() {
+
+    document.getElementById("studentModal")
+    .style.display = "none";
+
+}
+
+
+/* ======================================================
+   SAVE STUDENT
+====================================================== */
+
+document.getElementById("studentForm")
+.addEventListener("submit", function(e) {
+
+    e.preventDefault();
+
+    const student = {
+
+        ...(document.getElementById("editIndex").value === ""
+            ? {}
+            : students[Number(document.getElementById("editIndex").value)]),
+
+        image: pendingImages.student,
+
+        admission:
+        document.getElementById("admission").value,
+
+        name:
+        document.getElementById("studentName").value,
+
+        fatherName:
+        document.getElementById("fatherName").value,
+
+        fatherOccupation:
+        document.getElementById("fatherOccupation").value,
+
+        motherName:
+        document.getElementById("motherName").value,
+
+        motherOccupation:
+        document.getElementById("motherOccupation").value,
+
+        studentPhone:
+        document.getElementById("studentPhone").value,
+
+        parentPhone:
+        document.getElementById("parentPhone").value,
+
+        address:
+        document.getElementById("address").value,
+
+        studentAadhar:
+        document.getElementById("studentAadhar").value,
+
+        fatherAadhar:
+        document.getElementById("fatherAadhar").value,
+
+        motherAadhar:
+        document.getElementById("motherAadhar").value,
+
+        caste:
+        document.getElementById("caste").value,
+
+        religion:
+        document.getElementById("religion").value,
+
+        sscMarks:
+        Number(document.getElementById("sscMarks").value) || 0,
+
+        schoolName:
+        document.getElementById("schoolName").value,
+
+        schoolPlace:
+        document.getElementById("schoolPlace").value,
+
+        interMarks:
+        Number(document.getElementById("interMarks").value) || 0,
+
+        interCollege:
+        document.getElementById("interCollege").value,
+
+        group:
+        document.getElementById("group").value,
+
+        section:
+        document.getElementById("section").value,
+
+    };
+
+    const index =
+        document.getElementById("editIndex").value;
+
+    if(index === "") {
+
+        students.push(student);
+
+    } else {
+
+        students[Number(index)] = student;
+
+    }
+
+    saveLocalData(
+        "students",
+        JSON.stringify(students)
+    );
+
+    closeStudentForm();
+
+    displayStudents();
+
+    updateDashboard();
+
+});
+
+
+/* ======================================================
+   DISPLAY STUDENTS
+====================================================== */
+
+function displayStudents() {
+
+    const table =
+        document.getElementById("studentTable");
+
+    table.innerHTML = "";
+
+    const group =
+        document.getElementById("studentGroupFilter").value;
+
+    const section =
+        document.getElementById("studentSectionFilter").value;
+
+    const search =
+        document.getElementById("studentSearch")
+        .value.toLowerCase();
+
+    students.forEach((s,index) => {
+
+        if(group && s.group !== group)
+            return;
+
+        if(section && s.section !== section)
+            return;
+
+        if(search &&
+           !s.name.toLowerCase().includes(search) &&
+           !s.admission.toLowerCase().includes(search))
+            return;
+
+        const row = table.insertRow();
+
+        row.innerHTML = `
+
+        <td>${s.admission}</td>
+
+        <td>${s.image ? `<img class="table-photo" src="${s.image}" alt="Student photo">` : "-"}</td>
+
+        <td>${s.name}</td>
+
+        <td>${s.fatherName}</td>
+
+        <td>${s.motherName}</td>
+
+        <td>${s.studentPhone}</td>
+
+        <td>${s.parentPhone}</td>
+
+        <td>${s.group}</td>
+
+        <td>${s.section}</td>
+
+        <td>${s.sscMarks}</td>
+
+        <td>${s.interMarks}</td>
+
+        <td>
+
+        <button class="warning"
+        onclick="openStudentForm(${index})">
+        Edit
+        </button>
+
+        <button class="danger"
+        onclick="deleteStudent(${index})">
+        Delete
+        </button>
+
+        </td>
+
+        `;
+
+    });
+
+}
+
+
+/* ======================================================
+   DELETE STUDENT
+====================================================== */
+
+function deleteStudent(index) {
+
+    if(confirm("Delete this student?")) {
+
+        students.splice(index,1);
+
+        saveLocalData(
+            "students",
+            JSON.stringify(students)
+        );
+
+        displayStudents();
+
+        updateDashboard();
+
+    }
+
+}
+
+
+/* ======================================================
+   FACULTY
+====================================================== */
+
+document.getElementById("facultyForm")
+.addEventListener("submit", function(e) {
+
+    e.preventDefault();
+
+    const member = {
+        image: pendingImages.faculty,
+        name: document.getElementById("facultyName").value.trim(),
+        department: document.getElementById("facultyDepartment").value.trim(),
+        subject: document.getElementById("facultySubject").value.trim(),
+        phone: document.getElementById("facultyPhone").value.trim(),
+        email: document.getElementById("facultyEmail").value.trim(),
+        section: document.getElementById("facultySection").value
+    };
+
+    const index = document.getElementById("facultyEditIndex").value;
+
+    if(index === "") faculty.push(member);
+    else faculty[Number(index)] = member;
+
+    saveLocalData("faculty", JSON.stringify(faculty));
+    resetFacultyForm();
+    displayFaculty();
+
+});
+
+
+function displayFaculty() {
+
+    const table = document.getElementById("facultyTable");
+
+    if(!table) return;
+
+    table.innerHTML = "";
+
+    faculty.forEach((member, index) => {
+
+        const row = table.insertRow();
+
+        row.innerHTML = `
+        <td>${member.image ? `<img class="table-photo" src="${member.image}" alt="Faculty photo">` : "-"}</td>
+        <td>${member.name}</td>
+        <td>${member.department}</td>
+        <td>${member.subject || ""}</td>
+        <td>${member.phone || ""}</td>
+        <td>${member.email || ""}</td>
+        <td>${member.section || ""}</td>
+        <td>
+            <button class="warning" type="button" onclick="editFaculty(${index})">Edit</button>
+            <button class="danger" type="button" onclick="deleteFaculty(${index})">Delete</button>
+        </td>`;
+
+    });
+
+}
+
+
+function editFaculty(index) {
+
+    const member = faculty[index];
+
+    if(!member) return;
+
+    document.getElementById("facultyEditIndex").value = index;
+    pendingImages.faculty = member.image || null;
+    document.getElementById("facultyImagePreview").removeAttribute("src");
+    if(member.image) document.getElementById("facultyImagePreview").src = member.image;
+    document.getElementById("facultyName").value = member.name || "";
+    document.getElementById("facultyDepartment").value = member.department || "";
+    document.getElementById("facultySubject").value = member.subject || "";
+    document.getElementById("facultyPhone").value = member.phone || "";
+    document.getElementById("facultyEmail").value = member.email || "";
+    document.getElementById("facultySection").value = member.section || "";
+    document.getElementById("facultySaveButton").textContent = "Update Faculty";
+    document.getElementById("facultyName").focus();
+
+}
+
+
+function resetFacultyForm() {
+
+    document.getElementById("facultyForm").reset();
+    pendingImages.faculty = null;
+    document.getElementById("facultyImagePreview").removeAttribute("src");
+    document.getElementById("facultyEditIndex").value = "";
+    document.getElementById("facultySaveButton").textContent = "Add Faculty";
+
+}
+
+
+function deleteFaculty(index) {
+
+    if(!confirm("Delete this faculty member?")) return;
+
+    faculty.splice(index, 1);
+    saveLocalData("faculty", JSON.stringify(faculty));
+    displayFaculty();
+
+}
+
+
+/* ======================================================
+   ATTENDANCE
+====================================================== */
+
+function displayAttendance() {
+
+    const table =
+        document.getElementById("attendanceTable");
+
+    table.innerHTML = "";
+
+    const group =
+        document.getElementById("attendanceGroup").value;
+
+    const section =
+        document.getElementById("attendanceSection").value;
+
+    const date =
+        document.getElementById("attendanceDate").value ||
+        new Date().toISOString().split("T")[0];
+
+    students.forEach(s => {
+
+        if(group && s.group !== group)
+            return;
+
+        if(section && s.section !== section)
+            return;
+
+        const key = date + "_" + s.admission;
+
+        const status =
+            attendance[key] || "present";
+
+        const row = table.insertRow();
+
+        row.innerHTML = `
+
+        <td>${s.admission}</td>
+
+        <td>${s.name}</td>
+
+        <td>${s.section}</td>
+
+        <td>${s.group}</td>
+
+        <td class="attendance-status"><b>${status === "present" ? "Present" : "Absent"}</b></td>
+
+        <td>
+
+        <button
+        class="${status === 'present' ? 'success' : 'secondary'}"
+        onclick="setAttendance('${key}','present')">
+
+        ✓
+
+        </button>
+
+        </td>
+
+        <td>
+
+        <button
+        class="${status === 'absent' ? 'danger' : 'secondary'}"
+        onclick="setAttendance('${key}','absent')">
+
+        ✕
+
+        </button>
+
+        </td>
+
+        <td>
+        <button class="primary" onclick="sendAttendanceSMS(${students.indexOf(s)},'${status}')">
+        SMS
+        </button>
+        </td>
+
+        `;
+
+    });
+
+}
+
+
+function setAttendance(key,status) {
+
+    attendance[key] = status;
+
+    saveLocalData(
+        "attendance",
+        JSON.stringify(attendance)
+    );
+
+    displayAttendance();
+
+    updateDashboard();
+
+}
+
+
+function submitAttendance() {
+
+    saveLocalData(
+        "attendance",
+        JSON.stringify(attendance)
+    );
+
+    displayAttendance();
+    updateDashboard();
+
+}
+
+
+/* ======================================================
+   MARKS
+====================================================== */
+
+function getTotal(s) {
+
+    return (Number(s.maths) || 0) +
+           (Number(s.physics) || 0) +
+           (Number(s.chemistry) || 0) +
+           (Number(s.biology) || 0) +
+           (Number(s.english) || 0);
+
+}
+
+
+function displayMarks() {
+
+    const table =
+        document.getElementById("marksTable");
+
+    table.innerHTML = "";
+
+    const group =
+        document.getElementById("marksGroup").value;
+
+    const section =
+        document.getElementById("marksSection").value;
+
+    let data = students.filter(s => {
+
+        return (!group || s.group === group) &&
+               (!section || s.section === section);
+
+    });
+
+    data.sort(
+        (a,b) => getTotal(b) - getTotal(a)
+    );
+
+    data.forEach((s,index) => {
+
+        const row = table.insertRow();
+
+        row.innerHTML = `
+
+        <td>${index+1}</td>
+
+        <td>${s.admission}</td>
+
+        <td>${s.name}</td>
+
+        <td>${s.group}</td>
+
+        <td>${s.section}</td>
+
+        <td><input type="number" min="0" data-student="${students.indexOf(s)}" data-mark="maths" value="${s.maths ?? ''}" onchange="updateMark(this)"></td>
+
+        <td><input type="number" min="0" data-student="${students.indexOf(s)}" data-mark="physics" value="${s.physics ?? ''}" onchange="updateMark(this)"></td>
+
+        <td><input type="number" min="0" data-student="${students.indexOf(s)}" data-mark="chemistry" value="${s.chemistry ?? ''}" onchange="updateMark(this)"></td>
+
+        <td><input type="number" min="0" data-student="${students.indexOf(s)}" data-mark="biology" value="${s.biology ?? ''}" onchange="updateMark(this)"></td>
+
+        <td><input type="number" min="0" data-student="${students.indexOf(s)}" data-mark="english" value="${s.english ?? ''}" onchange="updateMark(this)"></td>
+
+        <td><b>${getTotal(s)}</b></td>
+
+        <td>
+        <button class="primary" onclick="sendMarksSMS(${students.indexOf(s)})">
+        SMS
+        </button>
+        </td>
+
+        `;
+
+    });
+
+}
+
+function updateMark(field) {
+
+    const student = students[Number(field.dataset.student)];
+
+    if(!student) return;
+
+    student[field.dataset.mark] = Number(field.value) || 0;
+
+    saveLocalData("students", JSON.stringify(students));
+
+    displayMarks();
+    displayOverall();
+    updateDashboard();
+
+}
+
+
+function submitMarks() {
+
+    saveLocalData(
+        "students",
+        JSON.stringify(students)
+    );
+
+    displayMarks();
+    displayOverall();
+    updateDashboard();
+
+}
+
+
+/* ======================================================
+   FEES
+====================================================== */
+
+function displayFees() {
+
+    const table =
+        document.getElementById("feesTable");
+
+    table.innerHTML = "";
+
+    const group =
+        document.getElementById("feesGroup").value;
+
+    students.forEach(s => {
+
+        if(group && s.group !== group)
+            return;
+
+        const balance =
+            s.balanceFee !== undefined
+            ? Number(s.balanceFee)
+            : Number(s.netFees) - Number(s.feesPaid);
+
+        const row = table.insertRow();
+
+        row.innerHTML = `
+
+        <td>${s.admission}</td>
+
+        <td>${s.name}</td>
+
+        <td>${s.group}</td>
+
+        <td><input type="number" min="0" data-student="${students.indexOf(s)}" data-fee="netFees" value="${s.netFees ?? ''}" onchange="updateFee(this)"></td>
+
+        <td><input type="number" min="0" data-student="${students.indexOf(s)}" data-fee="balanceFee" value="${s.balanceFee ?? balance}" onchange="updateFee(this)"></td>
+
+        <td>
+
+        <button
+        class="primary"
+        onclick="sendFeeSMS('${s.parentPhone}',
+        '${s.name}',
+        '${balance}')">
+
+        Send SMS
+
+        </button>
+
+        </td>
+
+        `;
+
+    });
+
+}
+
+function updateFee(field) {
+
+    const student = students[Number(field.dataset.student)];
+
+    if(!student) return;
+
+    student[field.dataset.fee] = Number(field.value) || 0;
+
+    saveLocalData("students", JSON.stringify(students));
+
+    displayFees();
+
+}
+
+
+/* ======================================================
+   PROGRESS
+====================================================== */
+
+function displayProgress() {
+
+    const select =
+        document.getElementById("progressStudent");
+
+    select.innerHTML =
+        '<option value="">Overall Progress</option>';
+
+    students.forEach((s,index) => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = index;
+
+        option.textContent =
+            s.admission + " - " + s.name;
+
+        select.appendChild(option);
+
+    });
+
+    const selected =
+        select.value;
+
+    const content =
+        document.getElementById("progressContent");
+
+    if(selected === "") {
+
+        let total = 0;
+
+        students.forEach(s => {
+            total += getTotal(s);
+        });
+
+        const average =
+            students.length ?
+            total / students.length : 0;
+
+        content.innerHTML = `
+
+        <h3>Overall Institution Performance</h3>
+
+        <br>
+
+        <p>Average Marks: ${average.toFixed(2)}</p>
+
+        <br>
+
+        <div class="progress-bar">
+
+        <div class="progress-fill"
+        style="width:${Math.min(average,100)}%">
+        </div>
+
+        </div>
+
+        `;
+
+        return;
+
+    }
+
+    const s = students[selected];
+
+    const total = getTotal(s);
+
+    const percentage =
+        total / 5;
+
+    content.innerHTML = `
+
+    <h3>${s.name}</h3>
+
+    <br>
+
+    <p>
+    Admission Number: ${s.admission}
+    </p>
+
+    <p>
+    Group: ${s.group}
+    </p>
+
+    <p>
+    Section: ${s.section}
+    </p>
+
+    <br>
+
+    <p>
+    Total Marks: <b>${total}</b>
+    </p>
+
+    <p>
+    Percentage: <b>${percentage.toFixed(2)}%</b>
+    </p>
+
+    <br>
+
+    <div class="progress-bar">
+
+    <div class="progress-fill"
+    style="width:${Math.min(percentage,100)}%">
+    </div>
+
+    </div>
+
+    <br>
+
+    <button class="primary"
+    onclick="sendProgressSMS('${s.parentPhone}',
+    '${s.name}',
+    '${percentage.toFixed(2)}')">
+
+    Send Progress to Parent
+
+    </button>
+
+    `;
+
+}
+
+
+/* ======================================================
+   EVENTS
+====================================================== */
+
+function addEvent() {
+
+    const name =
+        prompt("Enter event name:");
+
+    if(!name) return;
+
+    const description =
+        prompt("Enter event description:");
+
+    const date =
+        new Date().toISOString().split("T")[0];
+
+    events.push({
+
+        date: date,
+
+        name: name,
+
+        description: description || ""
+
+    });
+
+    saveLocalData(
+        "events",
+        JSON.stringify(events)
+    );
+
+    displayEvents();
+
+    updateDashboard();
+
+}
+
+
+function displayEvents() {
+
+    const table =
+        document.getElementById("eventsTable");
+
+    table.innerHTML = "";
+
+    events.forEach(event => {
+
+        const row = table.insertRow();
+
+        row.innerHTML = `
+
+        <td>${event.date}</td>
+
+        <td>${event.name}</td>
+
+        <td>${event.description}</td>
+
+        <td>
+
+        <button class="primary"
+        onclick="sendEventSMS('${event.name}')">
+
+        Send to Students
+
+        </button>
+
+        </td>
+
+        `;
+
+    });
+
+}
+
+
+/* ======================================================
+   OVERALL PERFORMANCE
+====================================================== */
+
+function displayOverall() {
+
+    const table =
+        document.getElementById("overallTable");
+
+    table.innerHTML = "";
+
+    let data = [...students];
+
+    data.sort(
+        (a,b) => getTotal(b) - getTotal(a)
+    );
+
+    data.forEach((s,index) => {
+
+        const total = getTotal(s);
+
+        const percentage =
+            total / 5;
+
+        const row = table.insertRow();
+
+        row.innerHTML = `
+
+        <td>${index+1}</td>
+
+        <td>${s.admission}</td>
+
+        <td>${s.name}</td>
+
+        <td>${s.group}</td>
+
+        <td>${s.section}</td>
+
+        <td>${total}</td>
+
+        <td>${percentage.toFixed(2)}%</td>
+
+        `;
+
+    });
+
+}
+
+
+/* ======================================================
+   SMS FUNCTIONS
+====================================================== */
+
+function openSms(phone, message) {
+
+    if(!phone) {
+        alert("No registered phone number is available for this student.");
+        return;
+    }
+
+    window.location.href =
+        "sms:" + phone + "?body=" + encodeURIComponent(message);
+
+}
+
+
+function registeredNumber(student) {
+
+    return student.parentPhone || student.studentPhone || "";
+
+}
+
+
+function sendAttendanceSMS(index, status) {
+
+    const student = students[index];
+
+    if(!student) return;
+
+    const date = document.getElementById("attendanceDate").value ||
+        new Date().toISOString().split("T")[0];
+
+    const message = "Attendance update for " + student.name +
+        " on " + date + ": " + status.toUpperCase() + ".";
+
+    openSms(registeredNumber(student), message);
+
+}
+
+
+function sendMarksSMS(index) {
+
+    const student = students[index];
+
+    if(!student) return;
+
+    const total = getTotal(student);
+    const percentage = (total / 5).toFixed(2);
+    const message = "Marks update for " + student.name +
+        ": Total " + total + ", Percentage " + percentage + "%.";
+
+    openSms(registeredNumber(student), message);
+
+}
+
+
+function filteredStudents(groupId, sectionId) {
+
+    const group = document.getElementById(groupId).value;
+    const section = document.getElementById(sectionId).value;
+
+    return students.filter(student =>
+        (!group || student.group === group) &&
+        (!section || student.section === section)
+    );
+
+}
+
+
+function sendBulkSMS(recipientStudents, message) {
+
+    const numbers = [...new Set(
+        recipientStudents
+            .map(registeredNumber)
+            .filter(Boolean)
+    )];
+
+    if(!numbers.length) {
+        alert("No registered phone numbers are available for the selected students.");
+        return;
+    }
+
+    openSms(numbers.join(","), message);
+
+}
+
+
+function sendBulkAttendanceSMS() {
+
+    const selected = filteredStudents("attendanceGroup", "attendanceSection");
+    const date = document.getElementById("attendanceDate").value ||
+        new Date().toISOString().split("T")[0];
+
+    sendBulkSMS(selected,
+        "Attendance update for " + date + ". Please check the student's attendance status.");
+
+}
+
+
+function sendBulkMarksSMS() {
+
+    const selected = filteredStudents("marksGroup", "marksSection");
+
+    sendBulkSMS(selected,
+        "Marks have been updated. Please contact the college for the student's detailed marks.");
+
+}
+
+/*
+ IMPORTANT:
+
+ These functions are placeholders.
+
+ Real SMS requires a secure backend/API.
+
+ Never place an SMS API secret key directly
+ inside this HTML file.
+*/
+
+function sendFeeSMS(phone,name,balance) {
+
+    alert(
+        "SMS Ready\n\n" +
+        "To: " + phone +
+        "\nStudent: " + name +
+        "\nBalance Fee: ₹" + balance
+    );
+
+}
+
+
+function sendProgressSMS(phone,name,percentage) {
+
+    alert(
+        "Progress SMS Ready\n\n" +
+        "To: " + phone +
+        "\nStudent: " + name +
+        "\nPercentage: " + percentage + "%"
+    );
+
+}
+
+
+function sendEventSMS(eventName) {
+
+    alert(
+        "Event notification ready.\n\n" +
+        "Event: " + eventName +
+        "\n\nConnect an SMS API to send this message."
+    );
+
+}
+
+
+/* ======================================================
+   EXCEL EXPORT
+====================================================== */
+
+function exportStudents() {
+
+    const data =
+        students.map(s => ({
+
+            "Admission Number": s.admission,
+
+            "Name": s.name,
+
+            "Father Name": s.fatherName,
+
+            "Father Occupation": s.fatherOccupation,
+
+            "Mother Name": s.motherName,
+
+            "Mother Occupation": s.motherOccupation,
+
+            "Student Phone": s.studentPhone,
+
+            "Parent Phone": s.parentPhone,
+
+            "Address": s.address,
+
+            "Student Aadhaar": s.studentAadhar,
+
+            "Father Aadhaar": s.fatherAadhar,
+
+            "Mother Aadhaar": s.motherAadhar,
+
+            "Caste": s.caste,
+
+            "Religion": s.religion,
+
+            "SSC Marks": s.sscMarks,
+
+            "School": s.schoolName,
+
+            "School Place": s.schoolPlace,
+
+            "Intermediate Marks": s.interMarks,
+
+            "Intermediate College": s.interCollege,
+
+            "Group": s.group,
+
+            "Section": s.section
+
+        }));
+
+    downloadExcel(data,"Student_Information");
+
+}
+
+
+function exportSelectedData() {
+
+    const type =
+        document.getElementById("exportType").value;
+
+    const group =
+        document.getElementById("exportGroup").value;
+
+    const section =
+        document.getElementById("exportSection").value;
+
+    let data =
+        students.filter(s => {
+
+            return (!group || s.group === group) &&
+                   (!section || s.section === section);
+
+        });
+
+
+    if(type === "students") {
+
+        data = data.map(s => ({
+
+            "Admission Number": s.admission,
+
+            "Name": s.name,
+
+            "Group": s.group,
+
+            "Section": s.section,
+
+            "Student Phone": s.studentPhone,
+
+            "Parent Phone": s.parentPhone,
+
+            "SSC Marks": s.sscMarks,
+
+            "Intermediate Marks": s.interMarks
+
+        }));
+
+    }
+
+
+    if(type === "marks") {
+
+        data = data.map(s => ({
+
+            "Admission Number": s.admission,
+
+            "Name": s.name,
+
+            "Group": s.group,
+
+            "Section": s.section,
+
+            "Maths": s.maths,
+
+            "Physics": s.physics,
+
+            "Chemistry": s.chemistry,
+
+            "Biology": s.biology,
+
+            "English": s.english,
+
+            "Total": getTotal(s)
+
+        }));
+
+    }
+
+
+    if(type === "fees") {
+
+        data = data.map(s => ({
+
+            "Admission Number": s.admission,
+
+            "Name": s.name,
+
+            "Group": s.group,
+
+            "Section": s.section,
+
+            "Net Fees": s.netFees,
+
+            "Balance": s.balanceFee !== undefined
+                ? s.balanceFee
+                : Number(s.netFees)-Number(s.feesPaid)
+
+        }));
+
+    }
+
+
+    if(type === "progress") {
+
+        data = data.map(s => ({
+
+            "Admission Number": s.admission,
+
+            "Name": s.name,
+
+            "Group": s.group,
+
+            "Section": s.section,
+
+            "Total Marks": getTotal(s),
+
+            "Percentage":
+            (getTotal(s)/5).toFixed(2)
+
+        }));
+
+    }
+
+
+    if(type === "attendance") {
+
+        data = data.map(s => {
+
+            const date =
+                document.getElementById("attendanceDate")
+                .value ||
+                new Date()
+                .toISOString()
+                .split("T")[0];
+
+            const status =
+                attendance[
+                    date + "_" + s.admission
+                ] || "present";
+
+            return {
+
+                "Admission Number": s.admission,
+
+                "Name": s.name,
+
+                "Section": s.section,
+
+                "Group": s.group,
+
+                "Status":
+                status === "present"
+                ? "✓ Present"
+                : "✕ Absent"
+
+            };
+
+        });
+
+    }
+
+    downloadExcel(data,
+        "College_" + type);
+
+}
+
+
+function downloadExcel(data,fileName) {
+
+    if(!data.length) {
+
+        alert("No data available.");
+
+        return;
+
+    }
+
+    const worksheet =
+        XLSX.utils.json_to_sheet(data);
+
+    const workbook =
+        XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        "Data"
+    );
+
+    XLSX.writeFile(
+        workbook,
+        fileName + ".xlsx"
+    );
+
+}
+
+
+/* ======================================================
+   PDF PRINTING
+====================================================== */
+
+function printableHtml(element) {
+
+    const clone = element.cloneNode(true);
+
+    clone.querySelectorAll("button, .filters, .pdf-button")
+        .forEach(item => item.remove());
+
+    clone.querySelectorAll("input, select, textarea")
+        .forEach(field => {
+
+            const value = field.tagName === "SELECT"
+                ? field.options[field.selectedIndex]?.text || ""
+                : field.value;
+
+            const text = document.createElement("span");
+            text.textContent = value;
+            field.replaceWith(text);
+
+        });
+
+    return clone.innerHTML;
+
+}
+
+
+function openPrintWindow(title, content) {
+
+    const printWindow = window.open("", "_blank");
+
+    if(!printWindow) {
+        alert("Please allow pop-ups to generate the PDF.");
+        return;
+    }
+
+    const collegeDetails = college || {};
+    const collegeName = collegeDetails.name || institutionTypeName();
+    const details = [
+        collegeDetails.place,
+        collegeDetails.branch,
+        collegeDetails.phone,
+        collegeDetails.sections?.length
+            ? `Sections: ${collegeDetails.sections.join(", ")}`
+            : ""
+    ].filter(Boolean);
+
+    printWindow.document.write(`<!doctype html>
+<html><head><title>${title}</title>
+<style>
+body{font-family:Arial,sans-serif;color:#17233f;padding:24px}
+.print-header{display:grid;grid-template-columns:1fr 1fr;align-items:start;border-bottom:3px solid #5ee7f7;padding-bottom:12px;margin-bottom:18px}
+.college-details{text-align:left;font-size:12px;line-height:1.5}
+.college-name{text-align:center;color:#12355b;font-size:22px;font-weight:700;padding:0 12px}
+h1{color:#12355b;font-size:20px;margin:0 0 18px}
+h2{margin-top:24px;color:#12355b}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:12px}
+th,td{border:1px solid #b7c5d8;padding:7px;text-align:left;vertical-align:top}
+th{background:#e7f3fb;color:#12355b}
+p{margin:7px 0}
+@media print{body{padding:0}h2{break-before:auto}table{page-break-inside:auto}tr{page-break-inside:avoid}}
+</style></head><body><header class="print-header"><div class="college-details">${details.join("<br>")}</div><div class="college-name">${collegeName}</div></header><h1>${title}</h1>${content}</body></html>`);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.onafterprint = () => printWindow.close();
+    setTimeout(() => printWindow.print(), 250);
+
+}
+
+
+function printSectionPdf(sectionId, title) {
+
+    const section = document.getElementById(sectionId);
+
+    if(!section) return;
+
+    openPrintWindow(title, printableHtml(section));
+
+}
+
+
+function printAllDataPdf() {
+
+    displayStudents();
+    displayAttendance();
+    displayMarks();
+    displayFees();
+    displayProgress();
+    displayEvents();
+    displayOverall();
+
+    displayFaculty();
+
+    const sections = ["overview", "students", "faculty", "attendance", "marks", "fees", "progress", "events", "overall"];
+    const content = sections.map(id => {
+        const section = document.getElementById(id);
+        return `<section>${printableHtml(section)}</section>`;
+    }).join("");
+
+    openPrintWindow(institutionTypeName() + " All Data", content);
+
+}
+
+
+/* ======================================================
+   DASHBOARD COUNTERS
+====================================================== */
+
+function updateDashboard() {
+
+    document.getElementById("totalStudents")
+    .innerText = students.length;
+
+    const today =
+        new Date()
+        .toISOString()
+        .split("T")[0];
+
+    let present = 0;
+    let absent = 0;
+
+    students.forEach(s => {
+
+        const status =
+            attendance[
+                today + "_" + s.admission
+            ];
+
+        if(status === "present")
+            present++;
+
+        if(status === "absent")
+            absent++;
+
+    });
+
+    document.getElementById("presentCount")
+    .innerText = present;
+
+    document.getElementById("absentCount")
+    .innerText = absent;
+
+    document.getElementById("totalEvents")
+    .innerText = events.length;
+
+}
+
+
+/* ======================================================
+   LOGOUT
+====================================================== */
+
+function logout() {
+
+    document.getElementById("dashboard")
+    .style.display = "none";
+
+    document.getElementById("homePage")
+    .style.display = "flex";
+
+    document.getElementById("loginEmail").value = "";
+    document.getElementById("loginPassword").value = "";
+    document.getElementById("authStatus").innerText = "Logged out. Login to continue.";
+    showAuthForm("login");
+
+}
+
+</script>
+
+</body>
+</html>
+```
+
